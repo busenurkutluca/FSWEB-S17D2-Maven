@@ -2,7 +2,7 @@ package com.workintech.s17d2.model;
 
 public class SeniorDeveloper extends Developer {
 
-    public SeniorDeveloper(Experience experience, int id, String name, double salary) {
-        super(experience.SENİOR, id, name, salary);
+    public SeniorDeveloper(int id, String name, double salary) {
+        super(Experience.SENIOR, id, name, salary);
     }
 }

@@ -1,26 +1,23 @@
 package com.workintech.s17d2.rest;
 
+import com.workintech.s17d2.dto.DeveloperResponse;
 import com.workintech.s17d2.model.*;
-import com.workintech.s17d2.tax.DeveloperTax;
 import com.workintech.s17d2.tax.Taxable;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @RestController
-@RequestMapping("/developers")
-public class DeveloperController  {
+@RequestMapping("/developers")//localhost:8585/workintech/developer/path
+public class DeveloperController {
 
-    private Map<Integer, Developer> developers = new HashMap<>();
-    public Taxable taxable;
+    public Map<Integer, Developer> developers = new HashMap<>();
+    private Taxable taxable;
 
-@Autowired
+    @Autowired
     public DeveloperController(Taxable taxable) {
         this.taxable = taxable;
     }
@@ -29,35 +26,53 @@ public class DeveloperController  {
 
     @PostConstruct
     public void init() {
-    this.developers=new HashMap<>();
-        developers.put(1, new JuniorDeveloper(Experience.JUNİOR,1,"buse ", 50000.0));
-        developers.put(2, new MidDeveloper(Experience.MİD, 2,"ebu", 70000.0));
-        developers.put(3, new SeniorDeveloper(Experience.SENİOR, 3, "BİLAL",90000.0));
+        this.developers = new HashMap<>();
+        developers.put(1, new JuniorDeveloper(1, "buse ", 50000d));
+        developers.put(2, new MidDeveloper(2, "ebu", 70000d));
+        developers.put(3, new SeniorDeveloper(3, "BİLAL", 90000d));
     }
+
+
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public DeveloperResponse save(@RequestBody Developer developer) {
+        Developer createdDeveloper = DeveloperFactory.createDeveloper(developer, taxable);
+        if (Objects.nonNull(createdDeveloper)) {
+            developers.put(createdDeveloper.getId(), createdDeveloper);
+        }
+        return new DeveloperResponse(createdDeveloper, "create işlemi başarılı", HttpStatus.CREATED.value());
+    }
+
     @GetMapping
     public List<Developer> getAllDevelopers() {
-        return new ArrayList<>(developers.values());
+        return developers.values().stream().toList();
     }
 
     @GetMapping("/{id}")
-    public Developer getDeveloperById(@PathVariable int id) {
-        return developers.get(id);
+    public DeveloperResponse getById(@PathVariable("id") int id) {
+        Developer foundDeveloper = this.developers.get(id);
+        if (foundDeveloper == null) {
+            return new DeveloperResponse(null, id + "ile search yapıldığında kayıt bulunur.", HttpStatus.NOT_FOUND.value());
+        }
+        return new DeveloperResponse(foundDeveloper, "İD İLE SEARCH BAŞARILI", HttpStatus.OK.value());
     }
 
-    @PostMapping
-    public Developer addDeveloper(@RequestBody Developer developer) {
-
-        return developer;
-    }
 
     @PutMapping("/{id}")
-    public Developer updateDeveloper(@PathVariable int id, @RequestBody Developer developer) {
-        developers.put(id, developer);
-        return developer;
+    public DeveloperResponse update(@PathVariable("id") int id, @RequestBody Developer developer) {
+        developer.setId(id);
+        Developer newDeveloper = DeveloperFactory.createDeveloper(developer, taxable);
+        this.developers.put(id, newDeveloper);
+        return new DeveloperResponse(newDeveloper, "update başarılı",HttpStatus.OK.value());
     }
 
     @DeleteMapping("/{id}")
-    public void deleteDeveloper(@PathVariable int id) {
-        developers.remove(id);
+    public DeveloperResponse delete (@PathVariable("id") int id) {
+        Developer removedDeveloper = this.developers.get(id);
+        if (removedDeveloper == null) {
+            return new DeveloperResponse(null, "Developer bulunamadı.", HttpStatus.NOT_FOUND.value());
+        }
+        this.developers.remove(id);
+        return new DeveloperResponse(removedDeveloper, "silme başarılı", HttpStatus.OK.value());
     }
 }
