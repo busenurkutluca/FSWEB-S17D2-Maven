@@ -22,14 +22,14 @@ public class DeveloperController {
         this.taxable = taxable;
     }
 
-    @Autowired
+
 
     @PostConstruct
     public void init() {
         this.developers = new HashMap<>();
-        developers.put(1, new JuniorDeveloper(1, "buse ", 50000d));
-        developers.put(2, new MidDeveloper(2, "ebu", 70000d));
-        developers.put(3, new SeniorDeveloper(3, "BİLAL", 90000d));
+        developers.put(1,new SeniorDeveloper(1,"buse",500000d));
+
+        //Developer developer = new Developer(expectedExperience, expectedId, expectedName, expectedSalary);
     }
 
 

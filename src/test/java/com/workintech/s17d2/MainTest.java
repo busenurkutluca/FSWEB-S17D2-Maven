@@ -48,7 +48,7 @@ class MainTest {
         double expectedSalary = 1000.0;
         Experience expectedExperience = Experience.JUNIOR;
         
-        Developer developer = new Developer(expectedId, expectedName, expectedSalary, expectedExperience);
+        Developer developer = new Developer( expectedExperience,expectedId, expectedName, expectedSalary);
 
         
         int actualId = developer.getId();
@@ -146,7 +146,7 @@ class MainTest {
         controller = new DeveloperController(new DeveloperTax());
         // Simulate @PostConstruct call if necessary. In reality, this is managed by Spring.
         controller.init();
-        Developer developer = new Developer(1, "Initial Developer", 5000.0, Experience.JUNIOR);
+        Developer developer = new Developer(Experience.JUNIOR,1, "Initial Developer", 5000.0);
         mockMvc.perform(post("/developers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(developer)))
@@ -199,7 +199,7 @@ class MainTest {
     @DisplayName("DeveloperController:AddDeveloper")
     @Order(2)
     void testAddDeveloper() throws Exception {
-        Developer newDeveloper = new Developer(2, "New Developer", 6000.0, Experience.MID);
+        Developer newDeveloper = new Developer(Experience.MID,1, "New Developer", 6000.0);
         mockMvc.perform(post("/developers")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(newDeveloper)))
@@ -228,7 +228,7 @@ class MainTest {
     @DisplayName("DeveloperController:UpdateDeveloper")
     @Order(5)
     void testUpdateDeveloper() throws Exception {
-        Developer updatedDeveloper = new Developer(1, "Updated Developer", 7000.0, Experience.SENIOR);
+        Developer updatedDeveloper = new Developer( Experience.SENIOR,1, "Updated Developer", 7000.0);
         mockMvc.perform(put("/developers/{id}", 1)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(updatedDeveloper)))
